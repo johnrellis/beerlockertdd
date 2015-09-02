@@ -4,6 +4,11 @@ var app = require('../app')(db);
 var assert = require('assert');
 var Beer = require('../models/beer');
 
+
+beforeEach('drink all beers', function() {
+	Beer.find().remove().exec();
+});
+
 describe('get /api', function() {
 	it('should return low beer message', function(done) {
 		request(app)
@@ -23,17 +28,18 @@ describe('put /beers', function() {
 		Beer.find().remove().exec();
 		request(app)
 			.put('/api/beers')
-			.send({body : {
-				name: 'sierra nevada',
-				type: 'pale ale',
-				quantity: '5'
-			}})
+			.send('name=dark arts')
+			.send('quantity=7')
+			.send('type=porter')
 			.expect(200)
 			.end(function(err, res) {
 				if (err) throw err;
-				Beer.count(function(err, count) {
+				Beer.find(function(err, beers) {
 					if (err) throw err;
-					assert.equal(count, 1);
+					assert.equal(beers.length, 1);
+					assert.equal(beers[0].name, 'dark arts');
+					assert.equal(beers[0].type, 'porter');
+					assert.equal(beers[0].quantity, 7);
 					done();
 				});
 			});

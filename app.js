@@ -6,13 +6,13 @@ module.exports = function(dbCredentials) {
 	var Beer = require('./models/beer');
 
 	mongoose.connect(dbCredentials.url);
-	
+
 	var db = mongoose.connection;
 	db.on('error', console.error.bind(console, 'connection error:'));
-	db.once('open', function (callback) {
-	  	console.log('connected to mongo')
-		Beer.count(function (err,count) {
-			if(err) throw err;
+	db.once('open', function(callback) {
+		console.log('connected to mongo')
+		Beer.count(function(err, count) {
+			if (err) throw err;
 			console.log(count + ' Beers Loaded');
 		})
 	});
@@ -22,10 +22,10 @@ module.exports = function(dbCredentials) {
 
 	app.set('port', process.env.PORT || 3000);
 	app.set('db', db);
-	
+
 	// Use the body-parser package in our application
 	app.use(bodyParser.urlencoded({
-	  extended: true
+		extended: true
 	}));
 
 	// Create our Express router
@@ -41,35 +41,46 @@ module.exports = function(dbCredentials) {
 
 	// Register all our routes with /api
 	app.use('/api', router);
-	
+
 	// Create a new route with the prefix /beers
 	var beersRoute = router.route('/beers');
 
-	beersRoute.put(function (req,res) {
-	    // Create a new instance of the Beer model
-	    var beer = new Beer();
+	beersRoute.put(function(req, res) {
+		// Create a new instance of the Beer model
+		var beer = new Beer();
 
 		console.log('Attempting to put ' + JSON.stringify(req.body));
-		console.log('Attempting to put ' + JSON.stringify(req.name));
-	    // Set the beer properties that came from the POST data
-	    beer.name = req.body.name;
-	    beer.type = req.body.type;
-	    beer.quantity = req.body.quantity;
+		// Set the beer properties that came from the POST data
+		beer.name = req.body.name;
+		beer.type = req.body.type;
+		beer.quantity = req.body.quantity;
 
-	    // Save the beer and check for errors
-	    beer.save(function(err) {
-	      if (err)
-	        res.send(err);
+		if (beer.name && beer.type && beer.quantity) {
+			// Save the beer and check for errors
+			beer.save(function(err) {
+				if (err)
+					res.send(err);
 
-	      res.json({ message: 'Beer added to the locker!', data: beer });
-	    });
+				res.json({
+					message: 'Beer added to the locker!',
+					data: beer
+				});
+			});
+		} else {
+			res.status(400).json({
+				message: 'you must have name, type and quantity'
+			});
+		}
+
 	});
-	
-	beersRoute.get(function (req,res) {
-		res.json({message:'not defined'})
+
+	beersRoute.get(function(req, res) {
+		res.json({
+			message: 'not defined'
+		})
 	});
-	
-	
+
+
 
 	return app;
 }
