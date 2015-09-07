@@ -75,9 +75,15 @@ module.exports = function(dbCredentials) {
 	});
 
 	beersRoute.get(function(req, res) {
-		res.json({
-			message: 'not defined'
-		})
+		Beer.find(function(err, beer) {
+			var json = beer
+			if (err) {
+				json = {
+					message: 'error finding beers'
+				};
+			}
+			res.json(json);
+		});
 	});
 
 

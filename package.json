@@ -5,6 +5,7 @@
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
     "mongoose": "^4.1.4",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "underscore": "^1.8.3"
   }
 }
