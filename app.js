@@ -79,10 +79,29 @@ module.exports = function(dbCredentials) {
 			var json = beer
 			if (err) {
 				json = {
-					message: 'error finding beers'
+					message: 'error finding beer ' + err
 				};
 			}
 			res.json(json);
+		});
+	});
+
+	var beerRoute = router.route('/beers/:id')
+
+	beerRoute.get(function(req, res) {
+		Beer.findById(req.params.id, function(err, beer) {
+			if (err) {
+				console.log(err + '!!!!');
+				res.status(500).json({
+					message: 'error retrieving beer ' + err
+				});
+			} else if (beer) {
+				res.json(beer);
+			} else {
+				res.status(404).json({
+					message: 'Beer is gone!'
+				});
+			}
 		});
 	});
 

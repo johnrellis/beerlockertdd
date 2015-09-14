@@ -79,7 +79,7 @@ describe('get /beers', function() {
 				request(app)
 					.get('/api/beers')
 					.expect(200)
-					.end(function (err, getRes) {
+					.end(function(err, getRes) {
 						if (err) throw err;
 						assert.equal(getRes.body.length, 2);
 						assert.equal(findBeer(getRes.body, 'dark arts').quantity, 7);
@@ -88,5 +88,37 @@ describe('get /beers', function() {
 					});
 			});
 		});
+	});
+});
+
+
+describe('get /beers/id', function() {
+	it('retrieve a beer by id', function(done) {
+		createBeer('rebel red', 8, 'red ale', function(err, res) {
+			var id = res.body.data._id
+			request(app)
+				.get('/api/beers/' + id)
+				.expect(200)
+				.end(function(err, getRes) {
+					if (err) throw err;
+					assert.equal(getRes.body.name, 'rebel red');
+					assert.equal(getRes.body.quantity, 8);
+					assert.equal(getRes.body.type, 'red ale');
+					done();
+				});
+		})
+	});
+});
+
+describe('get /beers/id', function() {
+	it('retrieve a non existant beer by id', function(done) {
+		request(app)
+			.get('/api/beers/507c35dd8fada716c89d0013')
+			.expect(404)
+			.end(function(err, res) {
+				if (err) throw err;
+				assert.equal(res.body.message, 'Beer is gone!');
+				done();
+			});
 	});
 });
