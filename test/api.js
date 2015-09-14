@@ -122,3 +122,50 @@ describe('get /beers/id', function() {
 			});
 	});
 });
+
+
+describe('put /beers/id', function() {
+	it('drink a number of beers', function(done) {
+		createBeer('rebel red', 10, 'red ale', function(err, res) {
+			var id = res.body.data._id
+			request(app)
+				.put('/api/beers/' + id)
+				.send('quantity=7')
+				.expect(200)
+				.end(function(err, putRes) {
+					if (err) throw err;
+					request(app)
+						.get('/api/beers/' + id)
+						.expect(200)
+						.end(function(err, getRes) {
+							if (err) throw err;
+							assert.equal(getRes.body.name, 'rebel red');
+							assert.equal(getRes.body.quantity, 3);
+							assert.equal(getRes.body.type, 'red ale');
+							done();
+						});
+				});
+		});
+	});
+});
+
+describe('delete /beers/id', function(){
+	it('delete a beer', function (done) {
+		createBeer('rebel red', 10, 'red ale', function(err, res) {
+			var id = res.body.data._id
+			request(app)
+				.delete('/api/beers/' + id)
+				.expect(200)
+				.end(function(err, putRes) {
+					if (err) throw err;
+					request(app)
+						.get('/api/beers/' + id)
+						.expect(404)
+						.end(function(err, getRes) {
+							if(err) throw err;
+							done();
+						});
+				});
+		});
+	});
+});

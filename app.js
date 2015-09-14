@@ -4,6 +4,7 @@ module.exports = function(dbCredentials) {
 	var mongoose = require('mongoose');
 	var bodyParser = require('body-parser');
 	var Beer = require('./models/beer');
+	var util = require('util');
 
 	mongoose.connect(dbCredentials.url);
 
@@ -91,7 +92,6 @@ module.exports = function(dbCredentials) {
 	beerRoute.get(function(req, res) {
 		Beer.findById(req.params.id, function(err, beer) {
 			if (err) {
-				console.log(err + '!!!!');
 				res.status(500).json({
 					message: 'error retrieving beer ' + err
 				});
@@ -101,6 +101,43 @@ module.exports = function(dbCredentials) {
 				res.status(404).json({
 					message: 'Beer is gone!'
 				});
+			}
+		});
+	});
+
+
+	beerRoute.put(function(req, res) {
+		Beer.findById(req.params.id, function(err, beer) {
+			if (err) {
+				console.log(err + '!!!!');
+				res.status(500).json({
+					message: 'error drinkin beer ' + err
+				});
+			} else if (beer) {
+				beer.quantity = beer.quantity - req.body.quantity;
+				beer.save(function(err) {
+					if (err) res.status(500).json({
+						error: err
+					});
+					console.log('sending 200');
+					res.status(200).send();
+				});
+			} else {
+				res.status(404).json({
+					message: 'No beer to drink!'
+				});
+			}
+		});
+	});
+	
+	beerRoute.delete(function(req, res) {
+		Beer.remove({_id : req.params.id}, function(err) {
+			if (err) {
+				res.status(500).json({
+					message: 'error retrieving beer ' + err
+				});
+			} else {
+				res.status(200).send();
 			}
 		});
 	});
